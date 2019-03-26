@@ -1,0 +1,71 @@
+{
+  "name": "@snaptopixel/testify",
+  "version": "0.4.1",
+  "description": "Easily test browser-ish Typescript projects with mocha",
+  "main": "./testify.js",
+  "types": "./testify.d.ts",
+  "bin": {
+    "testify": "./testify.js"
+  },
+  "scripts": {
+    "preversion": "npm test",
+    "postversion": "git push && git push --tags && npm publish",
+    "test": "node ./testify.js -t *.spec.ts",
+    "pretty": "prettier --write \"src/**/*.js?(x)\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/snaptopixel/testify.git"
+  },
+  "keywords": [
+    "mocha",
+    "chai",
+    "typescript",
+    "sinon",
+    "jsdom",
+    "glob"
+  ],
+  "author": "Casey Corcoran <github@snaptopixel.com> (http://snaptopixel.com)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/snaptopixel/testify/issues"
+  },
+  "homepage": "https://github.com/snaptopixel/testify#readme",
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.js": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "dependencies": {
+    "@types/chai": "^4.1.7",
+    "@types/chai-dom": "^0.0.7",
+    "@types/mocha": "^5.2.6",
+    "@types/node": "^11.11.7",
+    "@types/sinon": "^7.0.10",
+    "@types/sinon-chai": "^3.2.2",
+    "chai": "^4.2.0",
+    "chai-dom": "^1.8.1",
+    "chokidar": "^2.1.5",
+    "jsdom": "^14.0.0",
+    "jsdom-global": "^3.0.2",
+    "lodash": "^4.17.11",
+    "minimatch": "^3.0.4",
+    "mocha": "^6.0.2",
+    "sinon": "^7.3.0",
+    "sinon-chai": "^3.3.0",
+    "source-map-support": "^0.5.11",
+    "ts-node": "^8.0.3",
+    "typescript": "^3.3.4000",
+    "yargs": "^13.2.2"
+  },
+  "devDependencies": {
+    "lint-staged": "^8.1.5",
+    "prettier": "^1.16.4"
+  }
+}
