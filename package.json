@@ -1,6 +1,6 @@
 {
   "name": "@snaptopixel/testify",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Easily test browser-ish Typescript projects with mocha",
   "main": "./testify.js",
   "types": "./testify.d.ts",
