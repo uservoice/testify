@@ -2,12 +2,17 @@
 
 process.env.NODE_ENV = 'test';
 
-const yargs = require('yargs');
+const cosmiconfig = require('cosmiconfig');
+const cosmi = cosmiconfig('testify').searchSync();
 
-yargs.array('require');
+if (!cosmi || !cosmi.config) {
+  throw new Error('[Testify] No config found!');
+}
+
+const {config} = cosmi;
+
+const yargs = require('yargs');
 yargs.alias('w', 'watch');
-yargs.alias('t', 'test-glob');
-yargs.alias('r', 'require');
 
 const argv = yargs.argv;
 
@@ -26,29 +31,26 @@ const debounce = require('lodash/debounce');
 const includes = require('lodash/includes');
 const isFunction = require('lodash/isFunction');
 
-require('ts-node/register');
+const tsNode = require('ts-node');
+
+tsNode.register({
+  transpileOnly: true,
+  skipProject: true
+});
+
 require('source-map-support/register');
 
 jsdom();
 
 global.chai = chai;
 global.sinon = sinon;
-global.expect = window.expect = chai.expect;
+global.expect = chai.expect;
 
 chai.use(require('sinon-chai'));
 chai.use(require('chai-dom'));
 
-const aliases = {};
-
-const requireApi = {
-  chai,
-  addAlias(alias, actual) {
-    aliases[alias] = actual;
-  },
-};
-
-if (argv.r) {
-  argv.r.map(s => {
+if (config.require) {
+  config.require.map(s => {
     const required = require(path.resolve(s));
     if (isFunction(required)) {
       required(requireApi);
@@ -67,6 +69,8 @@ const runSuite = suite => {
     suite = path.resolve(suite);
     delete require.cache[suite];
     suitesToRun.push(suite);
+  } else {
+
   }
 };
 
@@ -130,7 +134,7 @@ Function.prototype.ensure = (_arr, func) => func();
 let watchQueue;
 const watchTargets = {};
 
-const testGlob = `${process.cwd()}/${argv.t}`;
+const testGlob = `${process.cwd()}/${config.files}`;
 const npmMatch = /.*node_modules.*/;
 
 // Monkey-patching native require so we can require files other than js
@@ -138,11 +142,13 @@ Module.prototype.require = function(modulePath) {
   assert(typeof modulePath === 'string', 'path must be a string');
   assert(modulePath, 'missing path');
   const currentDir = path.dirname(this.filename);
-  // Handle aliases
-  for (const alias of Object.keys(aliases)) {
-    if (modulePath.indexOf(alias) === 0) {
-      modulePath = modulePath.replace(alias, path.resolve(aliases[alias]));
-      break;
+  if (config.alias) {
+    const aliases = config.alias;
+    for (const alias of Object.keys(aliases)) {
+      if (modulePath.indexOf(alias) === 0) {
+        modulePath = modulePath.replace(alias, path.resolve(aliases[alias]));
+        break;
+      }
     }
   }
   // If this is a test file
@@ -168,7 +174,7 @@ Module.prototype.require = function(modulePath) {
 
 // When tests are added or changed, run them
 chokidar
-  .watch(argv.t, {
+  .watch(config.files, {
     persistent: true,
     ignored: npmMatch,
   })

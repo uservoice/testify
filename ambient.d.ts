@@ -1,0 +1,4 @@
+
+interface Window {
+  SomeGlobal: string;
+}

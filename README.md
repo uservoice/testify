@@ -1,22 +1,7 @@
 # testify
-Simple command-line interface plus opinionated configuration for testing browser-based Typescript projects with Mocha.
+An opinionated configuration and tool for testing browser-based Typescript projects with Mocha.
 
 💡 Builds upon many of the ideas from [@tomazzaman](https://github.com/tomazzaman)'s excellent article “[How to get fast unit tests with(out) Webpack](https://medium.com/@TomazZaman/how-to-get-fast-unit-tests-with-out-webpack-793c408a076f)”
-
-<!-- TOC depthFrom:2 -->
-
-- [What it does](#what-it-does)
-  - [✨ Bonus features](#✨-bonus-features)
-- [Using it in your projects](#using-it-in-your-projects)
-  - [Install with yarn or npm](#install-with-yarn-or-npm)
-  - [Add run script(s) to `package.json`](#add-run-scripts-to-packagejson)
-    - [Single test run](#single-test-run)
-    - [Watch mode (re-run tests when files are changed)](#watch-mode-re-run-tests-when-files-are-changed)
-    - [Single test run w/coverage](#single-test-run-wcoverage)
-- [Customizing the test environment](#customizing-the-test-environment)
-  - [Require API](#require-api)
-
-<!-- /TOC -->
 
 ### What it does
 Initializes and configures a testing environment with the following:
@@ -36,18 +21,28 @@ Initializes and configures a testing environment with the following:
 ```bash
 yarn add @snaptopixel/testify
 ```
+#### Configure with cosmiconfig
+Testify can be configured via:
+- `testify` object in `package.json`
+- `.testifyrc` file in yaml or json format
+- `testify.config.js` file
+
+Supported properties:
+- **files** - minimatch glob pattern for test files, ie: `src/**/*.spec.ts`
+- **require** - array of file paths to include, useful for [customizing the test environment](#customizing-the-test-environment)
+- **alias** - map of path/file aliases for requiring files,ie: `"@": "src"`
 
 #### Add run script(s) to `package.json`
 ##### Single test run  
 ```json
 {
-  "test": "testify -t tests/**/*.spec.ts"
+  "test": "testify"
 }
 ```
 ##### Watch mode (re-run tests when files are changed)
 ```json
 {
-  "test:watch": "testify -t packages/**/*.spec.ts -w"
+  "test:watch": "testify -w"
 }
 ```
 ##### Single test run w/coverage
@@ -58,19 +53,16 @@ yarn add @snaptopixel/testify
 }
 ```
 
+### The test environment
+`chai` `describe` `it` `expect` and `sinon` are available globally and don't need to be imported in your tests or `require` files
+
 ### Customizing the test environment
-You can require any number of .ts or .js files using the `-r` argument like so:
-```js
-{
-  "test": "testify -t tests/**/*.spec.ts -r some-file.ts some-other-file.js"
-}
-```
-These scripts will be required and executed in the node environment once jsdom has been initialized.  
+Required files will be executed in the node environment once jsdom has been initialized.  
 
 This is useful if your scripts depend on global variables, for example:
 
 ```js
-// In required js file
+// In required js/ts file
 window.SomeGlobal = {
   someMethod: sinon.spy()
 }
@@ -83,20 +75,10 @@ describe('globals', () => {
   })
 })
 ```
-#### Require API
-If your require file exports a function it will be called with an api object that allows for a few customization options:
 
-**TypeScript example**
-```ts
-export default function initTests(api: IRequireApi) {
-  // Add chai plugins via api.chai.use(MyPlugin)
-  // Add require aliases via api.addAlias('~'. './path/to/files')
-}
-```
-**JavaScript example**
-```js
-module.exports = function initTests(api) {
-  // Add chai plugins via api.chai.use(MyPlugin)
-  // Add require aliases via api.addAlias('~'. './path/to/files')
-}
-```
+You can also customize `chai` etc using the provided globals.
+
+### Type checking
+Note that testify will not type check your files. For the sake of simplicity and speed ts-node runs in "transpile only" mode.
+
+It's recommended to type check your project via `tsc --noEmit` as part of your ci and/or development process.

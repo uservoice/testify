@@ -1,6 +1,4 @@
-import { TestClass } from './fixtures';
-import * as sinon from 'sinon';
-import { expect } from 'chai';
+import { TestClass } from '@/fixtures';
 
 describe('testify', () => {
   it('can import .ts files, mock w/sinon and test the dom', () => {
@@ -11,5 +9,8 @@ describe('testify', () => {
     expect(instance.createDom).called;
     expect(testDiv).to.exist;
     expect(testDiv).attr('href', '#');
+  });
+  it('can require .ts files and augment the test environment', () => {
+    expect(window.SomeGlobal).to.eq("Hello World")
   });
 });
