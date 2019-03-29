@@ -17,6 +17,7 @@ yargs.alias('w', 'watch');
 const argv = yargs.argv;
 
 const path = require('path');
+const fs = require('fs');
 const assert = require('assert');
 const Module = require('module');
 
@@ -109,13 +110,16 @@ const runSuites = debounce(() => {
 });
 
 const genericLoader = () => ({});
+const textLoader = (parentDir, pathToFile) => {
+  return fs.readFileSync(pathToFile).toString();
+};
 
 const moduleLoaders = {
   css: genericLoader,
   sass: genericLoader,
   scss: genericLoader,
-  svg: genericLoader,
-  html: genericLoader,
+  svg: textLoader,
+  html: textLoader,
   png: genericLoader,
 };
 
