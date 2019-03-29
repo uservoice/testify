@@ -11,8 +11,7 @@
     "preversion": "npm test",
     "postversion": "git push && git push --tags && npm publish",
     "test": "node src/testify.js -t src/*.spec.ts",
-    "pretty": "prettier --write \"src/**/*.js?(x)\"",
-    "typecheck": "tsc --noEmit"
+    "pretty": "prettier --write \"src/**/*.js?(x)\""
   },
   "repository": {
     "type": "git",
@@ -40,7 +39,6 @@
   "lint-staged": {
     "*.js": [
       "prettier --write",
-      "typecheck",
       "git add"
     ]
   },
