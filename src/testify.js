@@ -9,7 +9,7 @@ if (!cosmi || !cosmi.config) {
   throw new Error('[Testify] No config found!');
 }
 
-const {config} = cosmi;
+const { config } = cosmi;
 
 const yargs = require('yargs');
 yargs.alias('w', 'watch');
@@ -35,12 +35,14 @@ const tsNode = require('ts-node');
 
 tsNode.register({
   transpileOnly: true,
-  skipProject: true
+  skipProject: true,
 });
 
 require('source-map-support/register');
 
-jsdom();
+jsdom('', {
+  url: 'http://localhost',
+});
 
 global.chai = chai;
 global.sinon = sinon;
@@ -70,7 +72,6 @@ const runSuite = suite => {
     delete require.cache[suite];
     suitesToRun.push(suite);
   } else {
-
   }
 };
 
