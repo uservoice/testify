@@ -51,17 +51,6 @@ global.expect = chai.expect;
 chai.use(require('sinon-chai'));
 chai.use(require('chai-dom'));
 
-if (config.require) {
-  config.require.map(s => {
-    const required = require(path.resolve(s));
-    if (isFunction(required)) {
-      required(requireApi);
-    } else if (isFunction(required.default)) {
-      required.default(requireApi);
-    }
-  });
-}
-
 let isWatching = argv.watch;
 let filesBeingWatched = {};
 let suitesToRun = [];
@@ -172,6 +161,12 @@ Module.prototype.require = function(modulePath) {
 
   return Module._load(modulePath, this);
 };
+
+if (config.require) {
+  config.require.map(s => {
+    require(path.resolve(s));
+  });
+}
 
 // When tests are added or changed, run them
 chokidar
