@@ -135,7 +135,7 @@ Module.prototype.require = function(modulePath) {
   if (config.alias) {
     const aliases = config.alias;
     for (const alias of Object.keys(aliases)) {
-      if (modulePath.indexOf(alias) === 0) {
+      if (new RegExp('^(' + alias + '$|' + alias + '/)').test(modulePath)) {
         modulePath = modulePath.replace(alias, path.resolve(aliases[alias]));
         break;
       }
