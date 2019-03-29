@@ -83,9 +83,15 @@ const watchDependencies = () => {
 };
 
 const runSuites = debounce(() => {
-  if (isWatching) console.log('\x1Bc'); // Clear console
-
+  //if (isWatching) console.log('\x1Bc'); // Clear console
   const m = new mocha();
+
+  if (config.require) {
+    config.require.map(s => {
+      m.addFile(path.resolve(s));
+    });
+  }
+
   suitesToRun.map(filepath => {
     m.addFile(filepath);
   });
@@ -167,11 +173,19 @@ Module.prototype.require = function(modulePath) {
   return Module._load(modulePath, this);
 };
 
-if (config.require) {
-  config.require.map(s => {
-    require(path.resolve(s));
-  });
-}
+// Polyfills
+
+global.MutationObserver = function MutationObserver() {
+  // https://github.com/tmpvar/jsdom/issues/639
+  return {
+    observe: function() {
+      return [];
+    },
+    takeRecords: function() {
+      return [];
+    },
+  };
+};
 
 // When tests are added or changed, run them
 chokidar
