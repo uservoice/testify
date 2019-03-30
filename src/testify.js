@@ -30,7 +30,6 @@ const chokidar = require('chokidar');
 const minimatch = require('minimatch');
 const debounce = require('lodash/debounce');
 const includes = require('lodash/includes');
-const isFunction = require('lodash/isFunction');
 
 const tsNode = require('ts-node');
 
@@ -178,14 +177,16 @@ Module.prototype.require = function(modulePath) {
 global.MutationObserver = function MutationObserver() {
   // https://github.com/tmpvar/jsdom/issues/639
   return {
-    observe: function() {
+    observe() {
       return [];
     },
-    takeRecords: function() {
+    takeRecords() {
       return [];
     },
   };
 };
+
+window.scrollTo = function() {};
 
 // When tests are added or changed, run them
 chokidar
