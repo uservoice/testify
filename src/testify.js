@@ -53,61 +53,35 @@ chai.use(require('sinon-chai'));
 chai.use(require('chai-dom'));
 
 let isWatching = argv.watch;
-let filesBeingWatched = {};
-let suitesToRun = [];
-
-const runSuite = suite => {
-  if (!includes(suitesToRun, suite)) {
-    suite = path.resolve(suite);
-    delete require.cache[suite];
-    suitesToRun.push(suite);
-  } else {
-  }
-};
-
-const watchDependencies = () => {
-  suitesToRun = [];
-  for (const testFile of Object.keys(watchTargets)) {
-    const watchQueue = filesBeingWatched[testFile] || [];
-    const filesToWatch = watchTargets[testFile].filter(
-      file => !includes(watchQueue, file),
-    );
-    chokidar.watch(filesToWatch, { persistent: true }).on('change', f => {
-      delete require.cache[f];
-      runSuite(testFile);
-      runSuites();
-    });
-    filesBeingWatched[testFile] = [...watchQueue, ...filesToWatch];
-  }
-};
+const watchedDependencies = {};
+const suitesToRun = [];
 
 const runSuites = debounce(() => {
-  //if (isWatching) console.log('\x1Bc'); // Clear console
+  if (isWatching) console.log('\x1Bc'); // Clear console
+  // TODO: Watch requires too?
+  document.body.innerHTML = ''; // Clean slate
   const m = new mocha();
-
   if (config.require) {
     config.require.map(s => {
       m.addFile(path.resolve(s));
     });
   }
-
   suitesToRun.map(filepath => {
+    delete require.cache[filepath];
     m.addFile(filepath);
   });
 
   try {
     const runner = m.run();
     runner.on('end', () => {
-      if (isWatching) {
-        watchDependencies();
-      } else {
+      if (!isWatching) {
         process.exit();
       }
     });
   } catch (e) {
+    console.log('errfz');
     if (isWatching) {
       console.log(e.stack);
-      watchDependencies();
     } else {
       throw e;
     }
@@ -131,9 +105,6 @@ const moduleLoaders = {
 // Monkey-patching the Function prototype so we can have require.ensure working.
 Function.prototype.ensure = (_arr, func) => func();
 
-let watchQueue;
-const watchTargets = {};
-
 const testGlob = `${process.cwd()}/${config.files}`;
 const npmMatch = /.*node_modules.*/;
 
@@ -151,16 +122,16 @@ Module.prototype.require = function(modulePath) {
       }
     }
   }
-  // If this is a test file
-  if (minimatch(modulePath, testGlob)) {
-    // Reset the dependency queue
-    watchQueue = watchTargets[modulePath] = [];
-  } else if (watchQueue) {
-    // Collect dependencies
+  // Set up watching for non test files
+  if (!minimatch(modulePath, testGlob)) {
     const fullPath = require.resolve(modulePath, { paths: [currentDir] });
-    // Ignore dependencies in node_modules
-    if (!fullPath.match(npmMatch)) {
-      watchQueue.push(fullPath);
+    if (!watchedDependencies[fullPath] && !fullPath.match(npmMatch)) {
+      watchedDependencies[fullPath] = true;
+      chokidar.watch(fullPath, { persistent: true }).on('change', () => {
+        console.log('asset chg', fullPath, fullPath in require.cache);
+        delete require.cache[fullPath];
+        runSuites();
+      });
     }
   }
   const extension = path.extname(modulePath).slice(1);
@@ -194,9 +165,15 @@ chokidar
     persistent: true,
     ignored: npmMatch,
   })
-  .on('add', file => runSuite(file))
-  .on('change', file => {
-    runSuite(file);
+  .on('add', file => {
+    if (!includes(suitesToRun, file)) {
+      suitesToRun.push(path.resolve(file));
+    }
     runSuites();
   })
-  .on('ready', () => runSuites());
+  .on('change', file => {
+    runSuites();
+  })
+  .on('ready', () => {
+    runSuites();
+  });
