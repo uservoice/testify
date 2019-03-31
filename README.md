@@ -14,7 +14,7 @@ Initializes and configures a testing environment with the following:
 - [jsdom](https://github.com/jsdom/jsdom) for a browser-esque environment
 #### ✨ Bonus features
 - 😏 No webpack
-- 🚀 Tracks dependencies in watch mode and only re-runs tests that are affected
+- 🚀 Tracks test files **and** dependencies in watch mode and re-runs tests
 
 ### Using it in your projects
 #### Install with yarn or npm
@@ -52,12 +52,17 @@ Supported properties:
   "test": "nyc testify -t tests/**/*.spec.ts"
 }
 ```
+#### Filtering tests
+Tests can be filtered via regex when using the command line:
+```bash
+npm run test -- -f "user"
+```
 
 ### The test environment
-`chai` `describe` `it` `expect` and `sinon` are available globally and don't need to be imported in your tests or `require` files
+`chai` `describe` `it` `expect` `assert` and `sinon` are available globally in tests and `require`d files
 
 ### Customizing the test environment
-Required files will be executed in the node environment once jsdom has been initialized.  
+Required files will be executed in the node environment once jsdom mocha have been initialized.  
 
 This is useful if your scripts depend on global variables, for example:
 
@@ -76,7 +81,10 @@ describe('globals', () => {
 })
 ```
 
-You can also customize `chai` etc using the provided globals.
+You can also customize `chai` and others using the globals:
+```js
+chai.use(require('chai-jquery'));
+```
 
 ### Type checking
 Note that testify will not type check your files. For the sake of simplicity and speed ts-node runs in "transpile only" mode.

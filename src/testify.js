@@ -1,6 +1,19 @@
 #!/usr/bin/env node
 
+const path = require('path');
+const fs = require('fs');
+const { exec } = require('child_process');
+
 process.env.NODE_ENV = 'test';
+process.env.NODE_OPTIONS = "--max-old-space-size=4096";
+process.env.CACHE_REQUIRE_PATHS_FILE = ".testify/require-paths.json";
+
+if (!fs.existsSync('.testify')) {
+  fs.mkdirSync('.testify');
+  exec(`echo '.testify' >> .gitignore`);
+}
+
+require('cache-require-paths');
 
 const cosmiconfig = require('cosmiconfig');
 const cosmi = cosmiconfig('testify').searchSync();
@@ -13,11 +26,9 @@ const { config } = cosmi;
 
 const yargs = require('yargs');
 yargs.alias('w', 'watch');
+yargs.alias('f', 'filter');
 
 const argv = yargs.argv;
-
-const path = require('path');
-const fs = require('fs');
 const assert = require('assert');
 const Module = require('module');
 
@@ -79,7 +90,6 @@ const runSuites = debounce(() => {
       }
     });
   } catch (e) {
-    console.log('errfz');
     if (isWatching) {
       console.log(e.stack);
     } else {
@@ -112,6 +122,7 @@ const npmMatch = /.*node_modules.*/;
 Module.prototype.require = function(modulePath) {
   assert(typeof modulePath === 'string', 'path must be a string');
   assert(modulePath, 'missing path');
+  const isTest = minimatch(modulePath, testGlob);
   const currentDir = path.dirname(this.filename);
   if (config.alias) {
     const aliases = config.alias;
@@ -123,12 +134,11 @@ Module.prototype.require = function(modulePath) {
     }
   }
   // Set up watching for non test files
-  if (!minimatch(modulePath, testGlob)) {
+  if (!isTest) {
     const fullPath = require.resolve(modulePath, { paths: [currentDir] });
     if (!watchedDependencies[fullPath] && !fullPath.match(npmMatch)) {
       watchedDependencies[fullPath] = true;
       chokidar.watch(fullPath, { persistent: true }).on('change', () => {
-        console.log('asset chg', fullPath, fullPath in require.cache);
         delete require.cache[fullPath];
         runSuites();
       });
@@ -159,6 +169,9 @@ global.MutationObserver = function MutationObserver() {
 
 window.scrollTo = function() {};
 
+let ready = false;
+let filter = argv.f ? new RegExp(argv.f) : false;
+
 // When tests are added or changed, run them
 chokidar
   .watch(config.files, {
@@ -167,13 +180,22 @@ chokidar
   })
   .on('add', file => {
     if (!includes(suitesToRun, file)) {
-      suitesToRun.push(path.resolve(file));
+      if (filter) {
+        if (file.match(filter)) {
+          suitesToRun.push(path.resolve(file));
+        }
+      } else {
+        suitesToRun.push(path.resolve(file));
+      }
     }
-    runSuites();
+    if (ready) {
+      runSuites();
+    }
   })
   .on('change', file => {
     runSuites();
   })
   .on('ready', () => {
     runSuites();
+    ready = true;
   });
