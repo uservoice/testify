@@ -10,7 +10,7 @@
   "scripts": {
     "preversion": "npm test",
     "postversion": "git push && git push --tags && npm publish",
-    "test": "node src/testify.js -t src/*.spec.ts",
+    "test": "node src/testify.js",
     "pretty": "prettier --write \"src/**/*.js?(x)\""
   },
   "repository": {
@@ -44,6 +44,7 @@
   },
   "testify": {
     "files": "src/*.spec.ts",
+    "src": "src/*.ts",
     "alias": {
       "@": "src"
     },
@@ -69,6 +70,7 @@
     "lodash": "^4.17.11",
     "minimatch": "^3.0.4",
     "mocha": "^6.0.2",
+    "ora": "^3.3.1",
     "sinon": "^7.3.1",
     "sinon-chai": "^3.3.0",
     "source-map-support": "^0.5.11",
