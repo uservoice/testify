@@ -5,7 +5,6 @@ const fs = require('fs');
 const { exec } = require('child_process');
 
 process.env.NODE_ENV = 'test';
-process.env.NODE_OPTIONS = "--max-old-space-size=4096";
 process.env.CACHE_REQUIRE_PATHS_FILE = ".testify/require-paths.json";
 
 if (!fs.existsSync('.testify')) {

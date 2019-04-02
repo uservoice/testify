@@ -35,27 +35,26 @@ Supported properties:
 #### Add run script(s) to `package.json`
 ##### Single test run  
 ```json
-{
-  "test": "testify"
-}
+"test": "testify"
 ```
 ##### Watch mode (re-run tests when files are changed)
 ```json
-{
-  "test:watch": "testify -w"
-}
+"test:watch": "testify -w"
 ```
 ##### Single test run w/coverage
 > 🗒 Install [nyc](https://github.com/istanbuljs/nyc) and prepend it to your script before `testify`. Check nyc's README for configuration options
 ```js
-{
-  "test": "nyc testify -t tests/**/*.spec.ts"
-}
+"test": "nyc testify"
 ```
 #### Filtering tests
 Tests can be filtered via regex when using the command line:
 ```bash
 npm run test -- -f "user"
+```
+#### Fixing "heap out of memory" errors
+Node has a default max memory usage of less than 2GB on some systems. This can cause unexpected memory issues. Add the following to your node_modules script if you have issues:
+```json
+"test": "process.env.NODE_OPTIONS=--max-old-space-size=4096 testify"
 ```
 
 ### The test environment
