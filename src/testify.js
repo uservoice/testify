@@ -38,7 +38,6 @@ let running = false;
 
 function runTests() {
   console.log('\x1Bc'); // Clear console
-  console.log('--')
   running = true;
   spinner.text = "Starting tests";
   spinner.start();
