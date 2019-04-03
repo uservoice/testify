@@ -44,20 +44,28 @@ function runTests() {
   spinner.start();
   const env = path.resolve(__dirname, 'environment');
   const bin = path.resolve('node_modules/mocha/bin/mocha');
-  const args = [testGlob, '-r', env, ...config.require, '--color'];
+  const args = [testGlob, '--file', env];
   if (argv.f) {
     args.push('-g', argv.f);
   }
+  if(config.require) {
+    config.require.map(f => {
+      args.push('--file', f)
+    });
+  }
+  args.push('--color');
   const mocha = spawn(bin, args);
+  mocha.stderr.on('data', d => {
+    process.stderr.write(String(d));
+  })
   mocha.stdout.on('data', d => {
     spinner.stop();
-    console.log(String(d).replace('\n', ''));
+    process.stdout.write(String(d));
   });
   mocha.on('close', () => {
     running = false;
     if (argv.watch) {
-      console.log('\n')
-      spinner.text = 'Waiting for changes (ctrl+c to exit)';
+      spinner.text = 'Waiting for changes (ctrl+c to exit)\n';
       spinner.start();
     } else {
       process.exit(mocha.exitCode);
@@ -79,6 +87,5 @@ if (argv.watch) {
       runTests();
     })
 }
-
 
 runTests();

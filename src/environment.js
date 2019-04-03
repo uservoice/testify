@@ -1,10 +1,22 @@
+// Those two lines must be run before `require('lolex')` is first called
+const logProcessErrors = require('log-process-errors')
+logProcessErrors({
+  level: { 
+    warning({ message }) {
+      if (message.includes('queueMicrotask() is experimental')) {
+        return 'silent' 
+      }
+    } 
+  }
+});
+
 const Module = require('module');
 const path = require('path');
 const chai = require('chai');
 const sinon = require('sinon');
 const jsdom = require('jsdom-global');
-const minimatch = require('minimatch');
 const tsNode = require('ts-node');
+const fs = require('fs');
 
 const cosmiconfig = require('cosmiconfig');
 const cosmi = cosmiconfig('testify').searchSync();
@@ -35,7 +47,7 @@ chai.use(require('sinon-chai'));
 chai.use(require('chai-dom'));
 
 const genericLoader = () => ({});
-const textLoader = (_parentDir, pathToFile) => {
+const textLoader = (pathToFile) => {
   return fs.readFileSync(pathToFile).toString();
 };
 
