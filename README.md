@@ -14,7 +14,7 @@ Initializes and configures a testing environment with the following:
 - [jsdom](https://github.com/jsdom/jsdom) for a browser-esque environment
 #### ✨ Bonus features
 - 😏 No webpack
-- 🚀 Tracks test files **and** dependencies in watch mode and re-runs tests
+- 🚀 Tracks test files and dependencies in watch mode and re-runs tests
 
 ### Using it in your projects
 #### Install with yarn or npm
@@ -29,36 +29,36 @@ Testify can be configured via:
 
 Supported properties:
 - **files** - minimatch glob pattern for test files, ie: `src/**/*.spec.ts`
+- **src** - minimatch glob pattern for source files, ie: `src/**/*.ts`
 - **require** - array of file paths to include, useful for [customizing the test environment](#customizing-the-test-environment)
 - **alias** - map of path/file aliases for requiring files,ie: `"@": "src"`
 
 #### Add run script(s) to `package.json`
-##### Single test run  
 ```json
 "test": "testify"
 ```
-##### Watch mode (re-run tests when files are changed)
-```json
-"test:watch": "testify -w"
+#### Watch mode
+Pass `-w` to run tests in watch mode
+```bash
+npm run test -- -w
 ```
-##### Single test run w/coverage
-> 🗒 Install [nyc](https://github.com/istanbuljs/nyc) and prepend it to your script before `testify`. Check nyc's README for configuration options
-```js
-"test": "nyc testify"
+Or add it as a package.json script
+```json
+"test.watch": "testify -w"
 ```
 #### Filtering tests
 Tests can be filtered via regex when using the command line:
 ```bash
-npm run test -- -f "user"
+npm run test -- -f user
 ```
-#### Fixing "heap out of memory" errors
-Node has a default max memory usage of less than 2GB on some systems. This can cause unexpected memory issues. Add the following to your node_modules script if you have issues:
-```json
-"test": "process.env.NODE_OPTIONS=--max-old-space-size=4096 testify"
+#### Coverage reporting
+Install [nyc](https://github.com/istanbuljs/nyc) and invoke it before `testify`. Check nyc's README for configuration options
+```js
+"test": "nyc testify"
 ```
 
 ### The test environment
-`chai` `describe` `it` `expect` `assert` and `sinon` are available globally in tests and `require`d files
+`chai` `describe` `it` `expect` `assert` and `sinon` are available globally in tests and `require` files
 
 ### Customizing the test environment
 Required files will be executed in the node environment once jsdom mocha have been initialized.  
