@@ -67,7 +67,7 @@
     "cosmiconfig": "^5.2.0",
     "jsdom": "^19.0.0",
     "jsdom-global": "^3.0.2",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.21",
     "log-process-errors": "^3.4.2",
     "minimatch": "^3.0.4",
     "mocha": "^6.0.2",
