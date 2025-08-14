@@ -1,12 +1,12 @@
 // Those two lines must be run before `require('lolex')` is first called
 const logProcessErrors = require('log-process-errors')
 logProcessErrors({
-  level: { 
+  level: {
     warning({ message }) {
       if (message.includes('queueMicrotask() is experimental')) {
-        return 'silent' 
+        return 'silent'
       }
-    } 
+    }
   }
 });
 
@@ -30,6 +30,7 @@ const { config } = cosmi;
 tsNode.register({
   transpileOnly: true,
   skipProject: true,
+  compilerOptions: { jsx: 'react' },
 });
 
 require('source-map-support/register');

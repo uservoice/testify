@@ -1,5 +1,5 @@
 {
-  "name": "@snaptopixel/testify",
+  "name": "@uservoice/testify",
   "version": "0.5.8",
   "description": "Easily test browser-ish Typescript projects with mocha",
   "main": "./src/testify.js",
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/snaptopixel/testify.git"
+    "url": "git+https://github.com/uservoice/testify.git"
   },
   "keywords": [
     "mocha",
@@ -25,12 +25,12 @@
     "jsdom",
     "glob"
   ],
-  "author": "Casey Corcoran <github@snaptopixel.com> (http://snaptopixel.com)",
+  "author": "Casey Corcoran <github@uservoice.com> (http://uservoice.com)",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/snaptopixel/testify/issues"
+    "url": "https://github.com/uservoice/testify/issues"
   },
-  "homepage": "https://github.com/snaptopixel/testify#readme",
+  "homepage": "https://github.com/uservoice/testify#readme",
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"
@@ -65,7 +65,7 @@
     "chai-dom": "^1.8.1",
     "chokidar": "^2.1.5",
     "cosmiconfig": "^5.2.0",
-    "jsdom": "^14.0.0",
+    "jsdom": "^19.0.0",
     "jsdom-global": "^3.0.2",
     "lodash": "^4.17.11",
     "log-process-errors": "^3.4.2",
