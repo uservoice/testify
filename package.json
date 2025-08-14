@@ -65,7 +65,7 @@
     "chai-dom": "^1.8.1",
     "chokidar": "^2.1.5",
     "cosmiconfig": "^5.2.0",
-    "jsdom": "^14.0.0",
+    "jsdom": "^26.1.0",
     "jsdom-global": "^3.0.2",
     "lodash": "^4.17.11",
     "log-process-errors": "^3.4.2",
